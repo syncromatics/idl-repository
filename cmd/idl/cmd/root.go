@@ -17,10 +17,10 @@ var (
 )
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&configLocation, "config", "./idl.yaml", "The location of the idl configuration yaml file")
+	RootCmd.PersistentFlags().StringVar(&configLocation, "config", "./idl.yaml", "The location of the idl configuration yaml file")
 }
 
-var rootCmd = &cobra.Command{
+var RootCmd = &cobra.Command{
 	Use:   "idl",
 	Short: "idl stores and fetches all sorts of idls",
 	Long:  `long explanation here`,
@@ -50,7 +50,7 @@ func initConfig() error {
 }
 
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
+	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}

@@ -26,7 +26,7 @@ func Pull(options PullOptions) error {
 
 	for _, dependency := range options.Configuration.Dependencies {
 		path := fmt.Sprintf("%s/v1/projects/%s/types/%s/versions/%s/data.tar.gz",
-			options.Configuration.Repository,
+			options.Configuration.ResolveRepository(dependency),
 			dependency.Name,
 			dependency.Type,
 			dependency.Version)

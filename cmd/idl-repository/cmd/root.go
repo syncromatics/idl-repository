@@ -20,11 +20,11 @@ var (
 )
 
 func init() {
-	port = rootCmd.Flags().IntP("port", "p", 80, "The port to host the server on")
-	storageDiretory = rootCmd.Flags().StringP("storage", "s", "/var/idl-repository", "The storage location for modules")
+	port = RootCmd.Flags().IntP("port", "p", 80, "The port to host the server on")
+	storageDiretory = RootCmd.Flags().StringP("storage", "s", ".idl", "The storage location for modules")
 }
 
-var rootCmd = &cobra.Command{
+var RootCmd = &cobra.Command{
 	Use:   "idl-repository",
 	Short: "idl-repository stores all sorts of idls",
 	Long:  `long explanation here`,
@@ -59,7 +59,7 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
+	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}

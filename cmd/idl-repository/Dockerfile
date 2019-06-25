@@ -21,4 +21,4 @@ WORKDIR /app
 
 COPY --from=0 /build/idl-repository /app/
 
-ENTRYPOINT ["/app/idl-repository"]
+ENTRYPOINT ["/app/idl-repository", "-s", "/var/idl-repository"]

@@ -2,6 +2,7 @@ package client
 
 import (
 	"archive/tar"
+	"bufio"
 	"compress/gzip"
 	"fmt"
 	"io"
@@ -13,6 +14,7 @@ import (
 	"github.com/syncromatics/idl-repository/pkg/config"
 
 	"github.com/coreos/go-semver/semver"
+	"github.com/docker/docker/pkg/fileutils"
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
 )
@@ -28,7 +30,8 @@ func Push(options PushOptions) error {
 	}
 
 	for _, provider := range options.Configuration.Provides {
-		tempFile, err := gzipRoot(provider.Root)
+		excludes := getExcludes(provider.IdlIgnore)
+		tempFile, err := gzipRoot(provider.Root, excludes)
 		if err != nil {
 			return err
 		}
@@ -57,7 +60,44 @@ func Push(options PushOptions) error {
 	return nil
 }
 
-func gzipRoot(root string) (string, error) {
+func getExcludes(idlIgnore string) []string {
+	if idlIgnore == "" {
+		excludes, err := readIdlIgnoreFile(".idlignore")
+		if err != nil {
+			return nil
+		}
+		return excludes
+	}
+
+	split := strings.Split(strings.Replace(strings.TrimSpace(idlIgnore), "\r\n", "\n", -1), "\n")
+	if len(split) > 1 {
+		return split
+	}
+
+	excludes, err := readIdlIgnoreFile(idlIgnore)
+	if err != nil {
+		return nil
+	}
+	return excludes
+
+}
+
+func readIdlIgnoreFile(path string) ([]string, error) {
+	file, err := os.Open(path)
+	defer file.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines, nil
+}
+
+func gzipRoot(root string, excludes []string) (string, error) {
 	name := xid.New()
 	tempLocation := fmt.Sprintf("%s/%s", os.TempDir(), name)
 
@@ -79,11 +119,32 @@ func gzipRoot(root string) (string, error) {
 
 	cleanRoot := strings.TrimPrefix(root, "./")
 
+	pm, err := fileutils.NewPatternMatcher(excludes)
+	if err != nil {
+		return "", err
+	}
+
 	err = filepath.Walk(root, func(file string, fi os.FileInfo, err error) error {
 
 		// return on any error
 		if err != nil {
 			return err
+		}
+
+		relFile, err := filepath.Rel(cleanRoot, file)
+		if err != nil {
+			// Error getting relative path OR we are looking
+			// at the source directory path. Skip in both situations.
+			return nil
+		}
+
+		skip, err := pm.Matches(relFile)
+		if err != nil {
+			return err
+		}
+
+		if skip {
+			return nil
 		}
 
 		// create a new dir/file header

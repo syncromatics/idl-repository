@@ -13,7 +13,7 @@ import (
 var _ = Describe("Configuration", func() {
 	Context("unmarshalling from text", func() {
 		text := `
-repository: myrepo.com
+repository: first.example.com
 name: stuff
 idl_directory: ./idl
 
@@ -25,13 +25,19 @@ dependencies:
   - name: dependency2
     version: 2.9.4
     type: avro
+    repository: second.example.net
 
 provides:
   - root: ./docs/protos
     type: protobuf
+    idlignore: custom_ignore_file
 
   - root: ./docs/avros
     type: avro
+    idlignore: |-
+        .noise
+        .tmp
+        *~
 `
 
 		configuration := new(config.Configuration)
@@ -43,7 +49,7 @@ provides:
 		})
 
 		It("should create settings object", func() {
-			Expect(configuration.Repository).To(Equal("myrepo.com"))
+			Expect(configuration.Repository).To(Equal("first.example.com"))
 			Expect(configuration.Name).To(Equal("stuff"))
 			Expect(configuration.IdlDirectory).To(Equal("./idl"))
 		})
@@ -53,16 +59,18 @@ provides:
 
 			Expect(configuration.Dependencies[0]).
 				To(Equal(config.Dependency{
-					Name:    "dependency1",
-					Version: "0.7.0",
-					Type:    "protobuf",
+					Name:       "dependency1",
+					Version:    "0.7.0",
+					Type:       "protobuf",
+					Repository: "",
 				}))
 
 			Expect(configuration.Dependencies[1]).
 				To(Equal(config.Dependency{
-					Name:    "dependency2",
-					Version: "2.9.4",
-					Type:    "avro",
+					Name:       "dependency2",
+					Version:    "2.9.4",
+					Type:       "avro",
+					Repository: "second.example.net",
 				}))
 		})
 
@@ -71,14 +79,16 @@ provides:
 
 			Expect(configuration.Provides[0]).
 				To(Equal(config.Provide{
-					Root: "./docs/protos",
-					Type: "protobuf",
+					Root:      "./docs/protos",
+					Type:      "protobuf",
+					IdlIgnore: "custom_ignore_file",
 				}))
 
 			Expect(configuration.Provides[1]).
 				To(Equal(config.Provide{
-					Root: "./docs/avros",
-					Type: "avro",
+					Root:      "./docs/avros",
+					Type:      "avro",
+					IdlIgnore: ".noise\n.tmp\n*~",
 				}))
 		})
 	})
@@ -98,7 +108,7 @@ provides:
 	Context("marshalling configuration to text", func() {
 		configuration := &config.Configuration{
 			Name:         "great-project",
-			Repository:   "our-company-repo.com",
+			Repository:   "first.example.com",
 			IdlDirectory: "./idl",
 			Dependencies: []config.Dependency{
 				config.Dependency{
@@ -107,19 +117,22 @@ provides:
 					Type:    "protobuf",
 				},
 				config.Dependency{
-					Name:    "dependency2",
-					Version: "3.8.9",
-					Type:    "avro",
+					Name:       "dependency2",
+					Version:    "3.8.9",
+					Type:       "avro",
+					Repository: "second.example.net",
 				},
 			},
 			Provides: []config.Provide{
 				config.Provide{
-					Root: "./docs/proto",
-					Type: "protobuf",
+					Root:      "./docs/proto",
+					Type:      "protobuf",
+					IdlIgnore: "custom_ignore_file",
 				},
 				config.Provide{
-					Root: "./docs/avro",
-					Type: "avro",
+					Root:      "./docs/avro",
+					Type:      "avro",
+					IdlIgnore: ".noise\n.tmp\n*~",
 				},
 			},
 		}
@@ -134,21 +147,28 @@ provides:
 
 		It("should create readable text", func() {
 			actual := string(text.Bytes())
-			expect := `repository: our-company-repo.com
+			expect := `repository: first.example.com
 name: great-project
 idl_directory: ./idl
 dependencies:
 - name: dependency1
   version: 0.8.6
   type: protobuf
+  repository: ""
 - name: dependency2
   version: 3.8.9
   type: avro
+  repository: second.example.net
 provides:
 - root: ./docs/proto
   type: protobuf
+  idlignore: custom_ignore_file
 - root: ./docs/avro
   type: avro
+  idlignore: |-
+    .noise
+    .tmp
+    *~
 `
 
 			Expect(actual).To(Equal(expect))

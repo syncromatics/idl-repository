@@ -11,11 +11,11 @@ import (
 )
 
 var (
-	version *semver.Version
+	packageVersion *semver.Version
 )
 
 func init() {
-	rootCmd.AddCommand(pushCommand)
+	RootCmd.AddCommand(pushCommand)
 }
 
 var pushCommand = &cobra.Command{
@@ -28,7 +28,7 @@ var pushCommand = &cobra.Command{
 		}
 
 		var err error
-		version, err = semver.NewVersion(args[0])
+		packageVersion, err = semver.NewVersion(args[0])
 		if err != nil {
 			return errors.Wrap(err, "invalid version")
 		}
@@ -43,7 +43,7 @@ var pushCommand = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		err := client.Push(client.PushOptions{
 			Configuration: configuration,
-			Version:       version,
+			Version:       packageVersion,
 		})
 		if err != nil {
 			cmd.PrintErrln(err)

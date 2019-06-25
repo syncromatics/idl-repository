@@ -10,8 +10,8 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceRoot}/cmd/idl/main.go",
-            "args": ["push", "9.0.0", "--config=${workspaceRoot}/idl.yaml"],
-            "cwd": "${workspaceRoot}"
+            "args": ["push", "0.0.0-development"],
+            "cwd": "${workspaceRoot}/docs/examples/full"
         },
         {
             "name": "Launch: idl pull",
@@ -19,8 +19,8 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceRoot}/cmd/idl/main.go",
-            "args": ["pull", "--config=${workspaceRoot}/idl.yaml"],
-            "cwd": "${workspaceRoot}"
+            "args": ["pull"],
+            "cwd": "${workspaceRoot}/docs/examples/full"
         },
         {
             "name": "Launch: idl-repository",
@@ -28,7 +28,7 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceRoot}/cmd/idl-repository/main.go",
-            "args": ["--port=8080", "--storage=./artifacts/storage"],
+            "args": ["--port=8080"],
             "cwd": "${workspaceRoot}"
         }
     ]

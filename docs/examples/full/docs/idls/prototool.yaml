@@ -1,0 +1,6 @@
+lint:
+  group: uber2
+  rules:
+    remove:
+    - FILE_OPTIONS_REQUIRE_OBJC_CLASS_PREFIX
+    - FILE_OPTIONS_REQUIRE_PHP_NAMESPACE

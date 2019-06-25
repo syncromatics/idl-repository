@@ -11,7 +11,7 @@ sudo: true
 
 before_install:
   - npm install -g github-release-cli
-  - go get -t -v ./...
+  - env GO111MODULE=on go mod download
   - sudo apt-get --yes install snapd
   - sudo snap install gogitver
 
