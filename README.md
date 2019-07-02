@@ -55,7 +55,7 @@ Read the full documentation for the repository service, [`idl-repository`][idl-r
 [![Travis](https://img.shields.io/travis/syncromatics/idl-repository.svg)](https://travis-ci.org/syncromatics/idl-repository)
 [![Docker Build Status](https://img.shields.io/docker/build/syncromatics/idl-repository.svg)](https://hub.docker.com/r/syncromatics/idl-repository/)
 
-Ensure you have your `GOPATH` configured properly. (Typically, you'll want to check this repo out to `$(go env GOPATH)/src/github.com/syncromatics/idl-repository`.) You'll also need Docker to build the Docker image for the repository.
+You'll need Docker to build the Docker image for the repository.
 
 Download dependencies
 
