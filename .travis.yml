@@ -25,5 +25,5 @@ deploy:
   provider: script
   script: env GO111MODULE=on PATH=$PATH:/snap/bin make publish
   on:
-    repo: syncromatics/idl-repostiory
+    repo: syncromatics/idl-repository
     tags: true
