@@ -39,3 +39,6 @@ publish:
 		"artifacts/linux.tar.gz" \
 		"artifacts/windows.zip" \
 		"artifacts/darwin.tar.gz"
+	
+version:
+	@echo $(VERSION)
