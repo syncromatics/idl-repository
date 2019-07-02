@@ -1,9 +1,12 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/pkg/errors"
 
 	"github.com/gorilla/mux"
 )
@@ -47,7 +50,7 @@ func NewServer(settings *Settings, storage Storage) *Server {
 	return &Server{settings, storage}
 }
 
-func (s *Server) Run() func() error {
+func (s *Server) Run(ctx context.Context) func() error {
 	r := mux.NewRouter()
 	project := newProjectRouter(s.storage)
 
@@ -57,8 +60,28 @@ func (s *Server) Run() func() error {
 
 	r.PathPrefix("/").HandlerFunc(s.handle404)
 
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", s.settings.Port),
+		Handler: r,
+	}
+
+	cancel := make(chan error)
+
+	go func() {
+		err := srv.ListenAndServe()
+		if err != nil {
+			cancel <- errors.Wrap(err, "failed to serve http")
+		}
+	}()
+
 	return func() error {
-		return http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", s.settings.Port), r)
+		select {
+		case <-ctx.Done():
+			// do nothing for now
+			return nil
+		case msg := <-cancel:
+			return msg
+		}
 	}
 }
 

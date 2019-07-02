@@ -21,7 +21,7 @@ var (
 
 func init() {
 	port = rootCmd.Flags().IntP("port", "p", 80, "The port to host the server on")
-	storageDiretory = rootCmd.Flags().StringP("storage", "s", "/tmp/storage", "The storage location for modules")
+	storageDiretory = rootCmd.Flags().StringP("storage", "s", "/var/idl-repository", "The storage location for modules")
 }
 
 var rootCmd = &cobra.Command{
@@ -42,7 +42,7 @@ var rootCmd = &cobra.Command{
 		ctx, cancel := context.WithCancel(context.Background())
 		grp, ctx := errgroup.WithContext(ctx)
 
-		grp.Go(server.Run())
+		grp.Go(server.Run(ctx))
 
 		// Wait for SIGINT/SIGTERM
 		waiter := make(chan os.Signal, 1)
