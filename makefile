@@ -26,7 +26,7 @@ package: test
 	rm -R $(BUILD_PATH)/darwin $(BUILD_PATH)/linux $(BUILD_PATH)/arm $(BUILD_PATH)/windows
 
 publish:
-	echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+	echo "$$DOCKER_PASSWORD" | docker login -u "$$DOCKER_USERNAME" --password-stdin
 	docker push syncromatics/idl-repository:${VERSION}
 
 	COMMIT_LOG=`git log -1 --format='%ci %H %s'`
