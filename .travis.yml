@@ -1,5 +1,7 @@
 language: go
-
+git:
+  depth: false
+  
 go:
   - 1.12.5
 go_import_path: github.com/syncromatics/idl-repository
@@ -14,6 +16,10 @@ before_install:
   - env GO111MODULE=on go mod download
   - sudo apt-get --yes install snapd
   - sudo snap install gogitver
+
+before_script:
+  - git fetch -tv
+  - git fetch origin master:master
 
 script:
   - env GO111MODULE=on PATH=$PATH:/snap/bin make package
