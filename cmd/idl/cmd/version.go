@@ -34,5 +34,4 @@ var (
 func init() {
 	versionCmd.Flags().BoolVarP(&shortened, "short", "s", false, "Use shortened output for version information.")
 	RootCmd.AddCommand(versionCmd)
-	fmt.Println(commit)
 }
