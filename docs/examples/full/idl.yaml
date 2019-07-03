@@ -1,0 +1,20 @@
+repository: http://idl-repository.example.com
+name: full-example
+idl_directory: "docs/idls/dependencies"
+
+dependencies:
+
+provides:
+  - root: docs/idls
+    type: proto
+    idlignore: .proto.idlignore
+
+  - root: docs/idls
+    type: avro
+    idlignore: |
+      *
+      !**/*.avdl
+
+  - root: docs/idls
+    type: example
+    # uses default .idlignore file

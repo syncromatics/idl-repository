@@ -1,0 +1,7 @@
+@namespace("com.example.v1")
+protocol Test {
+    record Thing {
+        string name;
+        long timestampMs;
+    }
+}

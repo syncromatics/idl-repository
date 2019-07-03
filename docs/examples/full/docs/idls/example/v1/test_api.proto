@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package example.v1;
+
+option csharp_namespace = "Example.V1";
+option go_package = "examplev1";
+option java_multiple_files = true;
+option java_outer_classname = "TestApiProto";
+option java_package = "com.example.v1";
+
+// Service to create things.
+service TestAPI {
+  // Creates a thing.
+  rpc CreateThing(CreateThingRequest) returns (CreateThingResponse);
+  // Gets a thing.
+  rpc GetThing(GetThingRequest) returns (GetThingResponse);
+  // Deletes a thing.
+  rpc DeleteThing(DeleteThingRequest) returns (DeleteThingResponse);
+}
+
+message CreateThingRequest {}
+message CreateThingResponse {}
+message GetThingRequest {}
+message GetThingResponse {}
+message DeleteThingRequest {}
+message DeleteThingResponse {}

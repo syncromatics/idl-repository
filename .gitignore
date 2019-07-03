@@ -12,6 +12,5 @@
 *.out
 
 artifacts/
-idl.yaml
 .idl/
 coverage.txt

@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/pkg/errors"
 )
@@ -15,16 +16,36 @@ type FileStorage struct {
 }
 
 func NewFileStorage(basePath string) (*FileStorage, error) {
-	_, err := os.Stat(basePath)
+	absBasePath, err := filepath.Abs(basePath)
 	if err != nil {
-		return nil, errors.Wrap(err, "file storage directory does not exist")
+		return nil, errors.Wrap(err, "failed determining absolute directory")
+	}
+	_, err = os.Stat(absBasePath)
+	if err != nil {
+		err := os.MkdirAll(absBasePath, os.ModePerm)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed creating directory")
+		}
 	}
 
-	return &FileStorage{basePath}, nil
+	return &FileStorage{absBasePath}, nil
 }
 
 func (s *FileStorage) ListFolders(path string) ([]string, error) {
-	files, err := ioutil.ReadDir(s.basePath + path)
+	fullPath, err := s.securePath(path)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not determine secure path")
+	}
+	stat, err := os.Stat(fullPath)
+	if err != nil {
+		return []string{}, nil
+	}
+
+	if !stat.IsDir() {
+		return nil, errors.Wrap(err, "path is not a directory")
+	}
+
+	files, err := ioutil.ReadDir(fullPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read directory")
 	}
@@ -44,7 +65,12 @@ func (s *FileStorage) File(path string) (io.Reader, error) {
 }
 
 func (s *FileStorage) Exists(path string) bool {
-	_, err := os.Stat(s.basePath + path)
+	securePath, err := s.securePath(path)
+	if err != nil {
+		return false
+	}
+
+	_, err = os.Stat(securePath)
 	if os.IsNotExist(err) {
 		return false
 	}
@@ -53,7 +79,12 @@ func (s *FileStorage) Exists(path string) bool {
 }
 
 func (s *FileStorage) MkDir(path string) error {
-	err := os.MkdirAll(s.basePath+path, os.ModePerm)
+	fullPath, err := s.securePath(path)
+	if err != nil {
+		return errors.Wrap(err, "could not determine secure path")
+	}
+
+	err = os.MkdirAll(fullPath, os.ModePerm)
 	if err != nil {
 		return errors.Wrap(err, "failed creating directory")
 	}
@@ -61,7 +92,12 @@ func (s *FileStorage) MkDir(path string) error {
 }
 
 func (s *FileStorage) CreateFile(path string, file io.Reader) error {
-	f, err := os.Create(s.basePath + path)
+	fullPath, err := s.securePath(path)
+	if err != nil {
+		return errors.Wrap(err, "could not determine secure path")
+	}
+
+	f, err := os.Create(fullPath)
 	if err != nil {
 		return errors.Wrap(err, "failed creating file")
 	}
@@ -92,15 +128,35 @@ func (s *FileStorage) CreateFile(path string, file io.Reader) error {
 }
 
 func (s *FileStorage) ReadFile(path string) (io.ReadCloser, error) {
-	_, err := os.Stat(s.basePath + path)
+	fullPath, err := s.securePath(path)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not determine secure path")
+	}
+
+	_, err = os.Stat(fullPath)
 	if os.IsNotExist(err) {
 		return nil, errors.New(fmt.Sprintf("'%s' does not exist", path))
 	}
 
-	f, err := os.Open(s.basePath + path)
+	f, err := os.Open(fullPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open file")
 	}
 
 	return f, nil
+}
+
+func (s *FileStorage) securePath(path string) (string, error) {
+	unsafePath := s.basePath + path
+	absPath, err := filepath.Abs(unsafePath)
+	if err != nil {
+		return "", err
+	}
+
+	_, err = filepath.Rel(s.basePath, absPath)
+	if err != nil {
+		return "", err
+	}
+
+	return absPath, nil
 }

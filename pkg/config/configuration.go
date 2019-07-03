@@ -16,14 +16,16 @@ type Configuration struct {
 }
 
 type Dependency struct {
-	Name    string `yaml:"name"`
-	Version string `yaml:"version"`
-	Type    string `yaml:"type"`
+	Name       string `yaml:"name"`
+	Version    string `yaml:"version"`
+	Type       string `yaml:"type"`
+	Repository string `yaml:"repository"`
 }
 
 type Provide struct {
-	Root string `yaml:"root"`
-	Type string `yaml:"type"`
+	Root      string `yaml:"root"`
+	Type      string `yaml:"type"`
+	IdlIgnore string `yaml:"idlignore"`
 }
 
 func (c *Configuration) Marshal(writer io.Writer) error {
@@ -47,4 +49,12 @@ func (c *Configuration) UnMarshal(reader io.Reader) error {
 	}
 
 	return nil
+}
+
+func (c *Configuration) ResolveRepository(dependency Dependency) string {
+	if dependency.Repository != "" {
+		return dependency.Repository
+	}
+
+	return c.Repository
 }
