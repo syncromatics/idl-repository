@@ -23,6 +23,7 @@ after_success:
 
 deploy:
   provider: script
+  skip_cleanup: true
   script: env GO111MODULE=on PATH=$PATH:/snap/bin make publish
   on:
     repo: syncromatics/idl-repository
