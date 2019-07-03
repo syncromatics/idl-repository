@@ -28,3 +28,4 @@ deploy:
   on:
     repo: syncromatics/idl-repository
     branch: master
+    tags: false

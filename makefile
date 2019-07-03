@@ -33,10 +33,11 @@ publish:
 	github-release upload \
 		--owner=syncromatics \
 		--repo=idl-repository \
-		--tag="latest" \
+		--tag="${VERSION}" \
 		--name="${TRAVIS_BRANCH}" \
 		--body="${COMMIT_LOG}" \
 		"artifacts/linux.tar.gz" \
+		"artifacts/arm.tar.gz" \
 		"artifacts/windows.zip" \
 		"artifacts/darwin.tar.gz"
 	
