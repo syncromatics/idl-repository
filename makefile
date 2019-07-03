@@ -1,13 +1,7 @@
-BUILD_PATH := ./artifacts
-LINUX_BUILD_PATH = $(BUILD_PATH)/linux/idl
-LINUX_ARM_BUILD_PATH = $(BUILD_PATH)/arm/idl
-WINDOWS_BUILD_PATH = $(BUILD_PATH)/windows/idl.exe
-MAC_BUILD_PATH = $(BUILD_PATH)/darwin/idl
-
-export VERSION=$(shell gogitver)
-export COMMIT_HASH=$(shell git rev-parse HEAD)
-export BUILD_DATE=$(shell date +%Y-%m-%dT%T%z)
-export BUILD_FLAGS=\
+export VERSION:=$(shell gogitver)
+export COMMIT_HASH:=$(shell git rev-parse HEAD)
+export BUILD_DATE:=$(shell date +%Y-%m-%dT%T%z)
+export BUILD_FLAGS:=\
 	-X github.com/syncromatics/idl-repository/cmd/idl/cmd.version=$(VERSION) \
 	-X github.com/syncromatics/idl-repository/cmd/idl/cmd.commit=$(COMMIT_HASH) \
 	-X github.com/syncromatics/idl-repository/cmd/idl/cmd.date=$(BUILD_DATE)
