@@ -1,10 +1,6 @@
 language: go
 git:
   depth: false
-  
-go:
-  - 1.12.5
-go_import_path: github.com/syncromatics/idl-repository
 
 services:
   - docker
@@ -13,7 +9,6 @@ sudo: true
 
 before_install:
   - npm install -g github-release-cli
-  - env GO111MODULE=on go mod download
   - sudo apt-get --yes install snapd
   - sudo snap install gogitver
 
@@ -22,7 +17,7 @@ before_script:
   - git fetch origin master:master
 
 script:
-  - env GO111MODULE=on PATH=$PATH:/snap/bin make package
+  - PATH=$PATH:/snap/bin make package
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
@@ -30,7 +25,7 @@ after_success:
 deploy:
   provider: script
   skip_cleanup: true
-  script: env GO111MODULE=on PATH=$PATH:/snap/bin make publish
+  script: PATH=$PATH:/snap/bin make publish
   on:
     repo: syncromatics/idl-repository
     branch: master

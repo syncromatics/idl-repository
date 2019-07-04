@@ -50,10 +50,21 @@ Read the full documentation for the repository service, [`idl-repository`][idl-r
 [idl-push]: docs/idl/idl_push.md
 [idl-repository]: docs/idl-repository/idl-repository.md
 
+### Docker image
+
+If you want to run `idl` inside a Docker container, you can do so:
+
+```bash
+docker run --rm -v $PWD:/data syncromatics/idl:__VERSION__ --help
+```
+
+Where `__VERSION__` is a valid tag from the [syncromatics/idl](https://hub.docker.com/r/syncromatics/idl/) Docker repository
+
 ## Building
 
 [![Travis](https://img.shields.io/travis/syncromatics/idl-repository.svg)](https://travis-ci.org/syncromatics/idl-repository)
 [![Docker Pulls](https://img.shields.io/docker/pulls/syncromatics/idl-repository.svg)](https://hub.docker.com/r/syncromatics/idl-repository/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/syncromatics/idl.svg)](https://hub.docker.com/r/syncromatics/idl/)
 
 You'll need Docker to build the Docker image for the repository.
 
