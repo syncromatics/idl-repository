@@ -24,6 +24,11 @@ func Pull(options PullOptions) error {
 		return errors.New("nothing to pull")
 	}
 
+	err := options.Configuration.Validate()
+	if err != nil {
+		return err
+	}
+
 	for _, dependency := range options.Configuration.Dependencies {
 		path := fmt.Sprintf("%s/v1/projects/%s/types/%s/versions/%s/data.tar.gz",
 			options.Configuration.ResolveRepository(dependency),
@@ -51,9 +56,14 @@ func Pull(options PullOptions) error {
 func unPackDependency(configuration *config.Configuration, dependency config.Dependency, file io.ReadCloser) error {
 	defer file.Close()
 
-	pth := path.Join(configuration.IdlDirectory, dependency.Name, dependency.Type, dependency.Version)
+	pth := path.Join(configuration.IdlDirectory, dependency.Name, dependency.Type)
 
-	err := os.MkdirAll(pth, os.ModePerm)
+	err := os.RemoveAll(pth)
+	if err != nil {
+		return errors.Wrap(err, "failed to clean path")
+	}
+
+	err = os.MkdirAll(pth, os.ModePerm)
 	if err != nil {
 		return errors.Wrap(err, "failed to create directories")
 	}

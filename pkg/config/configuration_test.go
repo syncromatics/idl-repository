@@ -174,4 +174,26 @@ provides:
 			Expect(actual).To(Equal(expect))
 		})
 	})
+
+	Context("having multiple entries for the same dependency", func() {
+		config := config.Configuration{
+			Dependencies: []config.Dependency{
+				config.Dependency{
+					Name: "same-dependency-name",
+					Type: "protobuf",
+				},
+				config.Dependency{
+					Name: "same-dependency-name",
+					Type: "protobuf",
+				},
+			},
+		}
+
+		err := config.Validate()
+
+		It("should have error", func() {
+			Expect(err).ToNot(BeNil())
+			Expect(err.Error()).To(Equal("the dependency 'same-dependency-name' with type 'protobuf' has more than one entry"))
+		})
+	})
 })
