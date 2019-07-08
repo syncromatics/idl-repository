@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/pkg/errors"
@@ -57,4 +58,20 @@ func (c *Configuration) ResolveRepository(dependency Dependency) string {
 	}
 
 	return c.Repository
+}
+
+func (c *Configuration) Validate() error {
+	requires := map[string]map[string]bool{}
+	for _, dep := range c.Dependencies {
+		_, ok := requires[dep.Name]
+		if !ok {
+			requires[dep.Name] = map[string]bool{}
+		}
+		_, ok = requires[dep.Name][dep.Type]
+		if ok {
+			return errors.New(fmt.Sprintf("the dependency '%s' with type '%s' has more than one entry", dep.Name, dep.Type))
+		}
+		requires[dep.Name][dep.Type] = true
+	}
+	return nil
 }
