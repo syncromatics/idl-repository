@@ -56,14 +56,20 @@ func Pull(options PullOptions) error {
 func unPackDependency(configuration *config.Configuration, dependency config.Dependency, file io.ReadCloser) error {
 	defer file.Close()
 
+	dirStat, err := os.Stat(configuration.IdlDirectory)
+	if err != nil {
+		return errors.Wrap(err, "failed to find idl_directory")
+	}
+	newMode := dirStat.Mode()
+
 	pth := path.Join(configuration.IdlDirectory, dependency.Name, dependency.Type)
 
-	err := os.RemoveAll(pth)
+	err = os.RemoveAll(pth)
 	if err != nil {
 		return errors.Wrap(err, "failed to clean path")
 	}
 
-	err = os.MkdirAll(pth, os.ModePerm)
+	err = os.MkdirAll(pth, newMode)
 	if err != nil {
 		return errors.Wrap(err, "failed to create directories")
 	}
@@ -107,13 +113,18 @@ func unPackDependency(configuration *config.Configuration, dependency config.Dep
 		// if its a dir and it doesn't exist create it
 		case tar.TypeDir:
 			if _, err := os.Stat(target); err != nil {
-				if err := os.MkdirAll(target, 0755); err != nil {
+				if err := os.MkdirAll(target, newMode); err != nil {
 					return err
 				}
 			}
 
 		// if it's a file create it
 		case tar.TypeReg:
+			parent := filepath.Dir(target)
+			if err := os.MkdirAll(parent, newMode); err != nil {
+				return err
+			}
+
 			f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
 			if err != nil {
 				return err
