@@ -32,6 +32,9 @@ WORKDIR /output
 COPY --from=build /build/coverage.txt ./
 
 FROM ubuntu:18.04 as idl
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update \
+    && apt-get -y install --no-install-recommends ca-certificates 2>&1
 ENTRYPOINT ["/app/idl"]
 VOLUME /data
 WORKDIR /data
