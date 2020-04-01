@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/syncromatics/idl-repository/pkg/config"
 
@@ -44,6 +45,12 @@ func initConfig() error {
 	err = configuration.UnMarshal(bufio.NewReader(dat))
 	if err != nil {
 		return errors.Wrap(err, "failed to read config")
+	}
+
+	workingDirectory := filepath.Dir(configLocation)
+	err = os.Chdir(workingDirectory)
+	if err != nil {
+		return errors.Wrap(err, "failed to change directory")
 	}
 
 	return nil
