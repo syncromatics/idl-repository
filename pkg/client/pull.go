@@ -56,11 +56,13 @@ func Pull(options PullOptions) error {
 func unPackDependency(configuration *config.Configuration, dependency config.Dependency, file io.ReadCloser) error {
 	defer file.Close()
 
+	var newMode os.FileMode
 	dirStat, err := os.Stat(configuration.IdlDirectory)
-	if err != nil {
-		return errors.Wrap(err, "failed to find idl_directory")
+	if err == nil {
+		 newMode = dirStat.Mode()
+	} else {
+		newMode = os.ModePerm
 	}
-	newMode := dirStat.Mode()
 
 	pth := path.Join(configuration.IdlDirectory, dependency.Name, dependency.Type)
 
